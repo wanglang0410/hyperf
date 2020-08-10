@@ -9,6 +9,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Model\Member;
 use App\Service\Admin\UserService;
 use App\Service\Admin\UserServiceInterface;
 use Hyperf\Contract\SessionInterface;
@@ -48,10 +49,13 @@ class UserController extends AbstractController
         if ($this->session->has('test')) {
             $this->session->set('uid', 1);
         }
-        $users =  Db::select('SELECT * FROM `member` WHERE id = ?', [1]);
-        foreach($users as $user){
-            echo $user->nick_name;
-        }
+//        $users =  Db::select('SELECT * FROM `member` WHERE id = ?', [1]);
+        $users = Db::table('member')->where('id', '>=', 1)->paginate(10)->toArray();
+        $users = Member::query()->where('id', 1)->offset(1)->limit(10)->get()->toArray();
+        var_dump($users);
+//        foreach($users as $user){
+//            echo $user->nick_name;
+//        }
         $user = $this->session->getName();
 //        $user = $this->session->get('test');
         return [
