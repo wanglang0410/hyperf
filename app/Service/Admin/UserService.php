@@ -8,12 +8,7 @@
 
 namespace App\Service\Admin;
 
-interface UserServiceInterface
-{
-    public function getById(int $id);
-}
-
-class UserService implements UserServiceInterface
+class UserService
 {
     public function getById($id = 0)
     {
