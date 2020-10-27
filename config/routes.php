@@ -15,6 +15,10 @@ use Hyperf\HttpServer\Router\Router;
 Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@index');
 //Router::get('/test', 'App\Controller\TestController::index');
 
-Router::addGroup('/admin/', function () {
-    Router::get('user/index', 'App\Controller\Admin\UserController@index');
-}, ['middleware' => [\App\Middleware\Admin\CheckMiddleware::class]]);
+//Router::addGroup('/admin/', function () {
+//    Router::get('user/index', 'App\Controller\Admin\UserController@index');
+//}, ['middleware' => [\App\Middleware\Admin\CheckMiddleware::class]]);
+
+Router::addServer('ws', function () {
+    Router::get('/', 'App\Controller\WebSocketController');
+});

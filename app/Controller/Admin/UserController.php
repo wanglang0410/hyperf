@@ -20,6 +20,8 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\Utils\Context;
 use Hyperf\Config\Annotation\Value;
+use Hyperf\View\RenderInterface;
+use Hyperf\WebSocketClient\ClientFactory;
 
 /**
  * Class UserController
@@ -50,6 +52,12 @@ class UserController extends AbstractController
      * @var ConfigInterface
      */
     private $config;
+
+    /**
+     * @Inject()
+     * @var ClientFactory
+     */
+    protected $clientFactory;
 
     /**
      * @RequestMapping(path="index", methods={"get"})
@@ -88,13 +96,24 @@ class UserController extends AbstractController
 
     /**
      * @RequestMapping(path="info", methods={"get"})
+     * @param RenderInterface $render
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function info()
+    public function info(RenderInterface $render)
     {
-        echo 'aaaa';
-        return [
-            'method' => 'GET',
-            'info' => '11',
-        ];
+        return $render->render('admin.user.info', ['name' => 'WL']);
+    }
+
+    /**
+     * @RequestMapping(path="join",methods={"get"})
+     */
+    public function join()
+    {
+        $host = '127.0.0.1:9555';
+        $client = $this->clientFactory->create($host);
+        $client->push('HttpServer 中使用 WebSocket Client 发送数据。');
+        $msg = $client->recv();
+        // 获取文本数据：$res_msg->data
+        return $msg->data;
     }
 }
