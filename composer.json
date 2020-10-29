@@ -40,7 +40,9 @@
         "hyperf/session": "^2.0",
         "hyperf/view": "^2.0",
         "hyperf/task": "^2.0",
-        "duncan3dc/blade": "^4.10"
+        "duncan3dc/blade": "^4.10",
+        "hyperf/websocket-server": "^2.0",
+        "hyperf/websocket-client": "^2.0"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
@@ -50,7 +52,8 @@
         "doctrine/common": "^2.9",
         "phpstan/phpstan": "^0.12",
         "hyperf/devtool": "~2.0.0",
-        "hyperf/testing": "~2.0.0"
+        "hyperf/testing": "~2.0.0",
+        "hyperf/watcher": "^2.0"
     },
     "suggest": {
         "ext-openssl": "Required to use HTTPS.",
