@@ -54,6 +54,7 @@ return [
         'task_worker_num' => 8,
         // 因为 `Task` 主要处理无法协程化的方法，所以这里推荐设为 `false`，避免协程下出现数据混淆的情况
         'task_enable_coroutine' => false,
+        'daemonize' => 0,
     ],
     'callbacks' => [
         SwooleEvent::ON_BEFORE_START => [Hyperf\Framework\Bootstrap\ServerStartCallback::class, 'beforeStart'],

@@ -18,6 +18,7 @@ use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Context;
 use Hyperf\Config\Annotation\Value;
 use Hyperf\View\RenderInterface;
@@ -101,6 +102,10 @@ class UserController extends AbstractController
      */
     public function info(RenderInterface $render)
     {
+        $container = ApplicationContext::getContainer();
+        $redis = $container->get(\Hyperf\Redis\Redis::class);
+        var_dump($redis->hGet('hset:list', 'name'));
+        var_dump('111');
         return $render->render('admin.user.info', ['name' => 'WL']);
     }
 

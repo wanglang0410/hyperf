@@ -16,6 +16,11 @@ return [
         'auth' => env('REDIS_AUTH', null),
         'port' => (int) env('REDIS_PORT', 6379),
         'db' => (int) env('REDIS_DB', 0),
+        'cluster' => [
+            'enable' => (bool) env('REDIS_CLUSTER_ENABLE', false),
+            'name' => null,
+            'seeds' => [],
+        ],
         'pool' => [
             'min_connections' => 1,
             'max_connections' => 10,

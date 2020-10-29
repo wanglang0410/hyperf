@@ -15,13 +15,11 @@ class WebSocketController implements OnMessageInterface, OnOpenInterface, OnClos
 {
     public function onMessage($server, Frame $frame): void
     {
-        var_dump($frame->data);
         $server->push($frame->fd, 'Recv: ' . $frame->data);
     }
 
     public function onClose($server, int $fd, int $reactorId): void
     {
-        var_dump('closed');
     }
 
     public function onOpen($server, Request $request): void
