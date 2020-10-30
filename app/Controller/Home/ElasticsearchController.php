@@ -24,34 +24,81 @@ class ElasticsearchController extends AbstractController
     {
         $builder = $this->container->get(ClientBuilderFactory::class)->create();
         $client = $builder->setHosts(['http://127.0.0.1:9200'])->build();
+        $body = [
+            'query' => [
+                'bool' => [
+//                    'must' => [
+//                        ['match_phrase' => ['name' => '张']],
+//                    ],
+                    'filter' => [
+                        ['range' => ['age' => [[
+                            'gt' => 18,
+//                            'lt' => 25
+                        ]]]],
+                    ]
+                ]
+            ]
+        ];
+        $data = $client->search([
+            'index' => 'my_index',
+            'type' => 'my_type',
+            'body' => $body,
+        ]);
+        var_dump($data);
+    }
+
+    /**
+     * @RequestMapping(path="put", methods={"get"})
+     */
+    public function put()
+    {
+        $client = $this->container->get(ClientBuilderFactory::class)->create();
+        $params = [
+            'index' => 'my_index',
+            'type' => 'my_type',
+            'id' => 30,
+            'body' => [
+                'name' => '张小红'
+            ]
+        ];
+        $client->build()->index($params);
+    }
+
+    /**
+     * @RequestMapping(path="batch_put", methods={"get"})
+     */
+    public function batchPut()
+    {
+        $builder = $this->container->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['http://127.0.0.1:9200'])->build();
         $params = ['body' => []];
         $array = [
             [
-                'id' => 1,
-                'name' => 'tom_1',
+                'id' => 10,
+                'name' => '赵东',
                 'age' => 18
             ],
             [
-                'id' => 2,
-                'name' => 'tom_2',
+                'id' => 11,
+                'name' => '赵曦',
                 'age' => 19
             ],
             [
-                'id' => 3,
-                'name' => 'tom_3',
+                'id' => 12,
+                'name' => '赵蓓',
                 'age' => 20
             ],
             [
-                'id' => 4,
-                'name' => 'tom_4',
+                'id' => 13,
+                'name' => '赵楠',
                 'age' => 21
             ], [
-                'id' => 5,
-                'name' => 'tom_5',
+                'id' => 14,
+                'name' => '赵中',
                 'age' => 22
             ], [
-                'id' => 6,
-                'name' => 'tom_6',
+                'id' => 15,
+                'name' => '赵霞',
                 'age' => 23
             ]
         ];
@@ -62,42 +109,34 @@ class ElasticsearchController extends AbstractController
                 'index' => [
                     '_index' => $indexName,
                     '_type' => $typeName,
-                    '_id' => $value['id'],
+                    '_id' => $value['id']
                 ]
             ];
             $params['body'][] = [
                 'name' => $value['name'],
-                'age' => $value['age'],
+                'age' => $value['age']
             ];
         }
-//        $client->bulk($params);
+        $client->bulk($params);
+        echo 'OK';
+    }
 
-//        $params = [];
-//        for ($i = 0; $i < 100; $i++) {
-//            $params['body'][] = [
-//                'index' => [
-//                    '_index' => 'my_index',
-//                    '_type' => 'my_type',
-//                    '_id' => $i,
-//                ]
-//            ];
-//
-//            $params['body'][] = [
-//                'my_field' => 'my_value',
-//                'second_field' => 'some more values'
-//            ];
-//        }
-        $data = $client->search([
+    /**
+     * @RequestMapping(path="update", methods={"get"})
+     */
+    public function update()
+    {
+        $client = $this->container->get(ClientBuilderFactory::class)->create();
+        $params = [
             'index' => 'my_index',
             'type' => 'my_type',
+            'id' => 1,
             'body' => [
-                'query' => [
-                    'match_phrase' => [
-                        'name' => 'o'
-                    ]
+                'doc' => [
+                    'name' => '张小红'
                 ]
-            ]
-        ]);
-        var_dump($data);
+            ],
+        ];
+        $client->build()->update($params);
     }
 }
