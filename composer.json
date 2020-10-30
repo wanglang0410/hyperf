@@ -43,7 +43,10 @@
         "duncan3dc/blade": "^4.10",
         "hyperf/websocket-server": "^2.0",
         "hyperf/websocket-client": "^2.0",
-        "hyperf/crontab": "^2.0"
+        "hyperf/crontab": "^2.0",
+        "hyperf/filesystem": "^2.0",
+        "overtrue/flysystem-qiniu": "^1.0",
+        "xxtime/flysystem-aliyun-oss": "^1.5"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
