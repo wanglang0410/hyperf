@@ -9,6 +9,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\AbstractController;
+use App\Middleware\Admin\AuthMiddleware;
 use App\Model\Member;
 use App\Service\Admin\UserService;
 use App\Service\Admin\UserServiceInterface;
@@ -17,12 +18,16 @@ use Hyperf\Contract\SessionInterface;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Context;
 use Hyperf\Config\Annotation\Value;
 use Hyperf\View\RenderInterface;
 use Hyperf\WebSocketClient\ClientFactory;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\DependencyInjection\Variable;
 
 /**
  * Class UserController
@@ -62,50 +67,22 @@ class UserController extends AbstractController
 
     /**
      * @RequestMapping(path="index", methods={"get"})
-     * @return array
+     * @Middleware(AuthMiddleware::class)
      */
     public function index()
     {
-//        Context::set('name', '111');
-//        Context::override('name', function (){
-//           return '2222';
-//        });
-        echo env('APP_NAME', '111') . PHP_EOL;
-        echo $this->config->has('databases.default.driver');
-        echo $this->configValue;
-        echo Context::get('name');
-        $user = $this->request->input('user', '11111');
-        $method = $this->request->getMethod();
-        $user = $this->userService->getById(1);
-//        if ($this->session->has('test')) {
-//            $this->session->set('uid', 1);
-//        }
-//        $users =  Db::select('SELECT * FROM `member` WHERE id = ?', [1]);
-//        $users = Db::table('member')->where('id', '>=', 1)->paginate(10)->toArray();
-//        $users = Member::query()->where('id', 1)->offset(1)->limit(10)->get()->toArray();
-//        var_dump($users);
-//        foreach($users as $user){
-//            echo $user->nick_name;
-//        }
-        $user = $this->session->getName();
-//        $user = $this->session->get('test');
-        return [
-            'method' => $method,
-            'message' => "Hello {$user}.",
-        ];
+        $uid = $this->request->getAttribute('uid');
+        $user = $this->userService->getById($uid);
+        return $this->response->json(['data' => $user]);
     }
 
     /**
      * @RequestMapping(path="info", methods={"get"})
-     * @param RenderInterface $render
-     * @return \Psr\Http\Message\ResponseInterface
      */
     public function info(RenderInterface $render)
     {
         $container = ApplicationContext::getContainer();
         $redis = $container->get(\Hyperf\Redis\Redis::class);
-        var_dump($redis->hGet('hset:list', 'name'));
-        var_dump('111');
         return $render->render('admin.user.info', ['name' => 'WL']);
     }
 

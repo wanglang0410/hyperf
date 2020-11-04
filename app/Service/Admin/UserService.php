@@ -8,10 +8,12 @@
 
 namespace App\Service\Admin;
 
+use App\Model\Member;
+
 class UserService
 {
-    public function getById($id = 0)
+    public function getById($id)
     {
-        return '222';
+        return Member::query()->where('id', $id)->first();
     }
 }

@@ -46,7 +46,8 @@
         "hyperf/crontab": "^2.0",
         "hyperf/filesystem": "^2.0",
         "overtrue/flysystem-qiniu": "^1.0",
-        "xxtime/flysystem-aliyun-oss": "^1.5"
+        "xxtime/flysystem-aliyun-oss": "^1.5",
+        "phper666/jwt-auth": "^3.0"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
