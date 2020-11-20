@@ -8,11 +8,11 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Log\LoggerInterface;
 
-/**
- * Class UserTask
- * @package App\Task
- * @Crontab(name="user", rule="* * * * *", callback="execute", memo="用户定时测试")
- */
+///**
+// * Class UserTask
+// * @package App\Task
+// * @Crontab(name="user", rule="* * * * *", callback="execute", memo="用户定时测试")
+// */
 class UserTask
 {
     /**

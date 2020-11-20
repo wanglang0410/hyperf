@@ -20,5 +20,5 @@ Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@i
 //}, ['middleware' => [\App\Middleware\Admin\CheckMiddleware::class]]);
 
 Router::addServer('ws', function () {
-    Router::get('/', 'App\Controller\WebSocketController');
+    Router::get('/ws', 'App\Controller\WebSocketController');
 });
