@@ -13,8 +13,12 @@ namespace App\Service;
 
 
 use App\Job\UserJob;
+use Hyperf\AsyncQueue\Annotation\AsyncQueueMessage;
 use Hyperf\AsyncQueue\Driver\DriverFactory;
 use Hyperf\AsyncQueue\Driver\DriverInterface;
+use Hyperf\Framework\Logger\StdoutLogger;
+use Hyperf\Utils\ApplicationContext;
+use Psr\Container\ContainerInterface;
 
 class QueueService
 {
@@ -40,5 +44,14 @@ class QueueService
         // 同理，如果内部使用了注解 @Value 会把对应对象一起序列化，导致消息体变大。
         // 所以这里也不推荐使用 `make` 方法来创建 `Job` 对象。
         return $this->driver->push(new UserJob($params), $delay);
+    }
+
+    /**
+     * @param $params
+     * @AsyncQueueMessage()
+     */
+    public function testPush($params)
+    {
+        ApplicationContext::getContainer()->get(StdoutLogger::class)->info($params);
     }
 }

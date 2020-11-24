@@ -59,6 +59,7 @@ class UserController extends AbstractController
      */
     private $config;
 
+
     /**
      * @Inject()
      * @var ClientFactory

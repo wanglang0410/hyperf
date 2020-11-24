@@ -10,6 +10,8 @@ namespace App\Job;
 
 
 use Hyperf\AsyncQueue\Job;
+use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Utils\ApplicationContext;
 
 class UserJob extends Job
 {
@@ -23,6 +25,7 @@ class UserJob extends Job
     public function handle()
     {
         // TODO: Implement handle() method.
-        var_dump($this->params);
+        $logger = ApplicationContext::getContainer()->get(StdoutLoggerInterface::class);
+        $logger->info($this->params);
     }
 }

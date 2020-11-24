@@ -28,6 +28,7 @@ class IndexController extends AbstractController
         $user = $this->request->input('user', '222');
         $method = $this->request->getMethod();
         $this->service->push('11111111111', 2);
+        $this->service->testPush('2222222222');
         return [
             'method' => $method,
             'message' => "Hello {$user}.",
