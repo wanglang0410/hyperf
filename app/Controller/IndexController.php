@@ -12,9 +12,16 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Annotation\User;
 use App\Service\QueueService;
+use Hyperf\Di\Annotation\AnnotationCollector;
 use Hyperf\Di\Annotation\Inject;
 
+/**
+ * Class IndexController
+ * @package App\Controller
+ * @User(name="123")
+ */
 class IndexController extends AbstractController
 {
     /**
@@ -26,12 +33,14 @@ class IndexController extends AbstractController
     public function index()
     {
         $user = $this->request->input('user', '222');
-        $method = $this->request->getMethod();
-        $this->service->push('11111111111', 2);
-        $this->service->testPush('2222222222');
-        return [
-            'method' => $method,
-            'message' => "Hello {$user}.",
-        ];
+        var_dump(AnnotationCollector::getClassByAnnotation(User::class));
+//        $method = $this->request->getMethod();
+//        $this->service->push('11111111111', 2);
+//        $this->service->testPush('2222222222');
+//        return [
+//            'method' => $method,
+//            'message' => "Hello {$user}.",
+//        ];
+//        return $user;
     }
 }
