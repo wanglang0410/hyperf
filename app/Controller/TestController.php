@@ -11,9 +11,12 @@
 
 namespace App\Controller;
 
+use App\Amqp\Producer\DemoProducer;
+use Hyperf\Amqp\Producer;
 use Hyperf\HttpServer\Annotation\AutoController;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
+use Hyperf\Utils\ApplicationContext;
 
 /**
  * @Controller();
@@ -36,7 +39,9 @@ class TestController extends AbstractController
 //        var_dump(env('APP_NAME'));
 //        $user = $this->request->input('user', 'Hyperf');
 //        $method = $this->request->getMethod();
-
+        $message = new DemoProducer(1);
+        $producer = ApplicationContext::getContainer()->get(Producer::class);
+        $producer->produce($message);
         return [
 //            'method' => $method,
             'message' => "Hello.",
