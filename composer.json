@@ -33,7 +33,7 @@
         "hyperf/config-aliyun-acm": "~2.0.0",
         "hyperf/constants": "~2.0.0",
         "hyperf/async-queue": "~2.0.0",
-        "hyperf/amqp": "~2.0.0",
+        "hyperf/amqp": "2.0.0",
         "hyperf/model-cache": "~2.0.0",
         "hyperf/elasticsearch": "~2.0.0",
         "hyperf/tracer": "~2.0.0",
@@ -47,14 +47,14 @@
         "hyperf/filesystem": "^2.0",
         "overtrue/flysystem-qiniu": "^1.0",
         "xxtime/flysystem-aliyun-oss": "^1.5",
-        "phper666/jwt-auth": "^3.0"
+        "phper666/jwt-auth": "^3.0",
+        "overtrue/wechat": "~4.0"
     },
     "require-dev": {
         "swoft/swoole-ide-helper": "^4.2",
         "phpmd/phpmd": "^2.6",
         "friendsofphp/php-cs-fixer": "^2.14",
         "mockery/mockery": "^1.0",
-        "doctrine/common": "^2.9",
         "phpstan/phpstan": "^0.12",
         "hyperf/devtool": "~2.0.0",
         "hyperf/testing": "~2.0.0",

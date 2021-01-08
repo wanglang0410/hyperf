@@ -19,6 +19,8 @@ Router::addRoute(['GET', 'POST', 'HEAD'], '/', 'App\Controller\IndexController@i
 //    Router::get('user/index', 'App\Controller\Admin\UserController@index');
 //}, ['middleware' => [\App\Middleware\Admin\CheckMiddleware::class]]);
 
+Router::addRoute(['GET', 'POST', 'HEAD'], '/wechat/event', 'App\Controller\WeChat\WeChatController@event');
+
 Router::addServer('ws', function () {
     Router::get('/ws', 'App\Controller\WebSocketController');
 });
