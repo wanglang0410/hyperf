@@ -11,14 +11,10 @@ use Hyperf\Amqp\Message\ProducerMessage;
 /**
  * @Producer(exchange="hyperf", routingKey="hyperf")
  */
-class DemoProducer extends ProducerMessage
+class DemoProducer extends DelayProducer
 {
-    public function __construct($id)
+    public function __construct($data, int $delay = 0)
     {
-        $user = Member::query()->where('id', $id)->first();
-        $this->payload = [
-            'id' => $id,
-            'data' => $user->toArray()
-        ];
+        parent::__construct($data, $delay);
     }
 }

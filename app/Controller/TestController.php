@@ -39,7 +39,7 @@ class TestController extends AbstractController
 //        var_dump(env('APP_NAME'));
 //        $user = $this->request->input('user', 'Hyperf');
 //        $method = $this->request->getMethod();
-        $message = new DemoProducer(1);
+        $message = new DemoProducer(['retry' => 3, 'id' => 1], 5000);
         $producer = ApplicationContext::getContainer()->get(Producer::class);
         $producer->produce($message);
         return [
