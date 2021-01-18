@@ -5,12 +5,16 @@ namespace App\Factory\WeChat;
 
 
 use EasyWeChat\Factory;
+use EasyWeChat\OfficialAccount\Application;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Guzzle\CoroutineHandler;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Logger\LoggerFactory;
+use Hyperf\Utils\ApplicationContext;
+use Overtrue\Socialite\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +28,7 @@ class WeChatFactory
     private $container;
 
     /**
-     * @var
+     * @var Application
      */
     private $app;
 
@@ -69,16 +73,35 @@ class WeChatFactory
         $this->app = $app;
     }
 
-    public function event()
+    /**
+     * 服务端
+     * @return false|string
+     * @throws \EasyWeChat\Kernel\Exceptions\BadRequestException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     * @throws \ReflectionException
+     */
+    public function server()
     {
         $this->initApp();
         $this->app->server->push(function ($message) {
+            $openid = $message['FromUserName'];
             switch ($message['MsgType']) {
                 case 'event':
-                    return '收到事件消息';
+                    switch ($message['Event']) {
+                        case 'subscribe':
+                        case 'unsubscribe':
+                        case 'CLICK':
+                        case "SCAN" ://已关注公众号的人再次关注触发该事件
+                            return $openid;
+                            break;
+                        default :
+                            break;
+                    }
+                    return $openid;
                     break;
                 case 'text':
-                    return '收到文字消息';
+                    return $openid;
                     break;
                 case 'image':
                     return '收到图片消息';
@@ -105,5 +128,17 @@ class WeChatFactory
         });
         $response = $this->app->server->serve();
         return $response->getContent();
+    }
+
+    /**
+     * @param $data
+     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
+     */
+    public function customerService($data)
+    {
+        return $this->app->customer_service->message($data)->send();
     }
 }

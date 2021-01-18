@@ -24,6 +24,6 @@ class WeChatController
 
     public function event()
     {
-        return $this->weChatFactory->event();
+        return $this->weChatFactory->server();
     }
 }
