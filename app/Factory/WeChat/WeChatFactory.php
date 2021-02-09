@@ -4,10 +4,13 @@
 namespace App\Factory\WeChat;
 
 
+use App\Amqp\Producer\DemoProducer;
+use App\Service\Message\CustomerMessageService;
 use EasyWeChat\Factory;
 use EasyWeChat\OfficialAccount\Application;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use Hyperf\Amqp\Producer;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Guzzle\CoroutineHandler;
@@ -38,6 +41,12 @@ class WeChatFactory
      */
     protected $request;
 
+    /**
+     * @Inject()
+     * @var CustomerMessageService
+     */
+    protected $customerMessageService;
+
     public function initApp()
     {
         $weChatConfig = $this->container->get(ConfigInterface::class)->get('wechat');
@@ -56,6 +65,11 @@ class WeChatFactory
             'http_errors' => false,
             'handler' => $stack,
         ]);
+        $this->app = $app;
+    }
+
+    public function rebindRequest()
+    {
         $get = $this->request->getQueryParams();
         $post = $this->request->getParsedBody();
         $cookie = $this->request->getCookieParams();
@@ -69,8 +83,7 @@ class WeChatFactory
         }
         $request = new Request($get, $post, [], $cookie, $files, $server, $xml);
         $request->headers = new HeaderBag($this->request->getHeaders());
-        $app->rebind('request', $request);
-        $this->app = $app;
+        $this->app->rebind('request', $request);
     }
 
     /**
@@ -84,6 +97,7 @@ class WeChatFactory
     public function server()
     {
         $this->initApp();
+        $this->rebindRequest();
         $this->app->server->push(function ($message) {
             $openid = $message['FromUserName'];
             switch ($message['MsgType']) {
@@ -101,6 +115,12 @@ class WeChatFactory
                     return $openid;
                     break;
                 case 'text':
+                    $this->customerMessageService->push([
+                        'delay' => 1,
+                        'data' => [
+                            'openid' => $openid
+                        ]
+                    ]);
                     return $openid;
                     break;
                 case 'image':
@@ -132,13 +152,15 @@ class WeChatFactory
 
     /**
      * @param $data
+     * @param $openid
      * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      * @throws \EasyWeChat\Kernel\Exceptions\RuntimeException
      */
-    public function customerService($data)
+    public function customerService($data, $openid)
     {
-        return $this->app->customer_service->message($data)->send();
+        $this->initApp();
+        return $this->app->customer_service->message($data)->to($openid)->send();
     }
 }
