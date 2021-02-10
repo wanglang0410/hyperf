@@ -6,6 +6,7 @@ namespace App\Controller\Home;
 
 use App\Controller\AbstractController;
 use App\Service\File\OssService;
+use App\Service\WeChat\WeChatMaterialService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -15,7 +16,6 @@ use Hyperf\HttpServer\Annotation\RequestMapping;
  * Class OssController
  * @package App\Controller\Home
  * @Controller(prefix="home/oss")
- * @Middleware()
  */
 class OssController extends AbstractController
 {
@@ -24,6 +24,12 @@ class OssController extends AbstractController
      * @var OssService
      */
     private $ossService;
+
+    /**
+     * @Inject()
+     * @var WeChatMaterialService
+     */
+    private $weChatMaterialService;
 
     /**
      * @RequestMapping(path="upload", methods={"post"})

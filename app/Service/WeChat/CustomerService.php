@@ -5,6 +5,7 @@ namespace App\Service\WeChat;
 
 
 use App\Factory\WeChat\WeChatFactory;
+use EasyWeChat\Kernel\Messages\Image;
 use EasyWeChat\Kernel\Messages\Text;
 use Hyperf\Di\Annotation\Inject;
 
@@ -18,7 +19,11 @@ class CustomerService
 
     public function sendMessage($data =[])
     {
-        $text = new Text('这是一个延迟的消息');
-        return $this->weChatFactory->customerService($text, $data['openid']);
+        $openid = $data['openid'];
+        $text = new Text('欢迎来得WL的个人空间');
+        $this->weChatFactory->customerService($text, $openid);
+        $image = new Image('hzo1WpT55SfTc4VezTLAleanvdHelqvOncdO7gYbVFE');
+        $this->weChatFactory->customerService($image, $openid);
+        $this->weChatFactory->templateMessage($openid, '78txlEoBY6DBbQZwY9c63yc01D-2VnNHuPDGSi2V6P8');
     }
 }

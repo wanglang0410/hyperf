@@ -4,21 +4,17 @@
 namespace App\Factory\WeChat;
 
 
-use App\Amqp\Producer\DemoProducer;
 use App\Service\Message\CustomerMessageService;
 use EasyWeChat\Factory;
 use EasyWeChat\OfficialAccount\Application;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
-use Hyperf\Amqp\Producer;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Guzzle\CoroutineHandler;
 use Hyperf\HttpServer\Contract\RequestInterface;
-use Hyperf\Logger\LoggerFactory;
-use Hyperf\Utils\ApplicationContext;
-use Overtrue\Socialite\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -65,7 +61,9 @@ class WeChatFactory
             'http_errors' => false,
             'handler' => $stack,
         ]);
+        $app['cache'] = $this->container->get(CacheInterface::class);
         $this->app = $app;
+        return $this;
     }
 
     public function rebindRequest()
@@ -84,6 +82,7 @@ class WeChatFactory
         $request = new Request($get, $post, [], $cookie, $files, $server, $xml);
         $request->headers = new HeaderBag($this->request->getHeaders());
         $this->app->rebind('request', $request);
+        return $this;
     }
 
     /**
@@ -96,8 +95,7 @@ class WeChatFactory
      */
     public function server()
     {
-        $this->initApp();
-        $this->rebindRequest();
+        $this->initApp()->rebindRequest();
         $this->app->server->push(function ($message) {
             $openid = $message['FromUserName'];
             switch ($message['MsgType']) {
@@ -162,5 +160,45 @@ class WeChatFactory
     {
         $this->initApp();
         return $this->app->customer_service->message($data)->to($openid)->send();
+    }
+
+    /**
+     * @param $openid
+     * @param $templateId
+     * @param $data
+     * @param $url
+     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function templateMessage($openid, $templateId, $data = [], $url = 'http://www.baidu.com')
+    {
+        $this->initApp();
+        return $this->app->template_message->send([
+            'touser' => $openid,
+            'template_id' => $templateId,
+            'data' => $data,
+            'url' => $url,
+        ]);
+    }
+
+    /**
+     * 上传素材
+     * @param $localPath
+     * @param bool $temp
+     * @return array|\EasyWeChat\Kernel\Support\Collection|object|\Psr\Http\Message\ResponseInterface|string
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidArgumentException
+     * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function uploadImage($localPath, $temp = true)
+    {
+        $this->initApp();
+        if ($temp) {
+            return $this->app->media->uploadImage($localPath);
+        } else {
+            return $this->app->material->uploadImage($localPath);
+        }
     }
 }
