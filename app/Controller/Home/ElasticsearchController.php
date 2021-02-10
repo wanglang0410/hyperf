@@ -5,6 +5,8 @@ namespace App\Controller\Home;
 
 
 use App\Controller\AbstractController;
+use App\Service\ElasticSearchService;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\Elasticsearch\ClientBuilderFactory;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -18,33 +20,53 @@ use Hyperf\Utils\ApplicationContext;
 class ElasticsearchController extends AbstractController
 {
     /**
+     * @Inject()
+     * @var ElasticSearchService
+     */
+    private $elasticSearchService;
+
+    /**
      * @RequestMapping(path="index", methods={"get"})
      */
     public function index()
     {
-        $builder = $this->container->get(ClientBuilderFactory::class)->create();
-        $client = $builder->setHosts(['http://127.0.0.1:9200'])->build();
         $body = [
+            //搜索 match 全匹配  match_phrase模糊匹配
             'query' => [
                 'bool' => [
-//                    'must' => [
-//                        ['match_phrase' => ['name' => '张']],
-//                    ],
+                    //must 相当于and
+                    'must' => [
+//                      ['match_phrase' => ['name' => '张']],
+//                        ['terms' => ['age' => [23,22]]],
+                    ],
+                    //should 相当于or
+                    'should' => [
+                        ['match_phrase' => ['name' => '张']],
+                        ['match_phrase' => ['name' => '李']],
+                        ['match_phrase' => ['name' => '滚']],
+                        ['match_phrase' => ['name' => '不']],
+                    ],
+                    "minimum_should_match" => 1,
                     'filter' => [
-                        ['range' => ['age' => [[
-                            'gt' => 18,
-//                            'lt' => 25
-                        ]]]],
+                        [
+                            'range' => [
+                                'age' => [
+                                    ['gt' => 0]
+                                ]
+                            ]
+                        ],
                     ]
+                ]
+            ],
+            //排序
+            'sort' => [
+                'age' => [
+                    "order" => "desc",
                 ]
             ]
         ];
-        $data = $client->search([
-            'index' => 'my_index',
-            'type' => 'my_type',
-            'body' => $body,
-        ]);
-        var_dump($data);
+        $data = $this->elasticSearchService->search($body);
+        return $this->response->json($data);
     }
 
     /**
@@ -52,16 +74,8 @@ class ElasticsearchController extends AbstractController
      */
     public function put()
     {
-        $client = $this->container->get(ClientBuilderFactory::class)->create();
-        $params = [
-            'index' => 'my_index',
-            'type' => 'my_type',
-            'id' => 30,
-            'body' => [
-                'name' => '张小红'
-            ]
-        ];
-        $client->build()->index($params);
+        $result = $this->elasticSearchService->put(['id' => 200, 'name' => '不学无术', 'age' => 200]);
+        return $this->response->json($result);
     }
 
     /**
@@ -69,56 +83,20 @@ class ElasticsearchController extends AbstractController
      */
     public function batchPut()
     {
-        $builder = $this->container->get(ClientBuilderFactory::class)->create();
-        $client = $builder->setHosts(['http://127.0.0.1:9200'])->build();
-        $params = ['body' => []];
-        $array = [
+        $data = [
             [
-                'id' => 10,
-                'name' => '赵东',
-                'age' => 18
-            ],
-            [
-                'id' => 11,
-                'name' => '赵曦',
-                'age' => 19
-            ],
-            [
-                'id' => 12,
-                'name' => '赵蓓',
+                'id' => 300,
+                'name' => '不二家的小子啊小子啊',
                 'age' => 20
             ],
             [
-                'id' => 13,
-                'name' => '赵楠',
-                'age' => 21
-            ], [
-                'id' => 14,
-                'name' => '赵中',
-                'age' => 22
-            ], [
-                'id' => 15,
-                'name' => '赵霞',
-                'age' => 23
+                'id' => 301,
+                'name' => '不三家',
+                'age' => 19
             ]
         ];
-        $indexName = 'my_index';
-        $typeName = 'my_type';
-        foreach ($array as $value) {
-            $params['body'][] = [
-                'index' => [
-                    '_index' => $indexName,
-                    '_type' => $typeName,
-                    '_id' => $value['id']
-                ]
-            ];
-            $params['body'][] = [
-                'name' => $value['name'],
-                'age' => $value['age']
-            ];
-        }
-        $client->bulk($params);
-        echo 'OK';
+        $result = $this->elasticSearchService->bulk($data);
+        return $this->response->json($result);
     }
 
     /**
@@ -126,17 +104,29 @@ class ElasticsearchController extends AbstractController
      */
     public function update()
     {
-        $client = $this->container->get(ClientBuilderFactory::class)->create();
-        $params = [
-            'index' => 'my_index',
-            'type' => 'my_type',
-            'id' => 1,
-            'body' => [
-                'doc' => [
-                    'name' => '张小红'
-                ]
-            ],
-        ];
-        $client->build()->update($params);
+        $result = $this->elasticSearchService->update(300, [
+            'id' => 300,
+            'name' => '不要啊客官客官客官',
+            'age' => 40,
+        ]);
+        return $this->response->json($result);
+    }
+
+    /**
+     * @RequestMapping(path="delete", methods={"get","post"})
+     */
+    public function delete()
+    {
+        $result = $this->elasticSearchService->delete(200);
+        return $this->response->json($result);
+    }
+
+    /**
+     * @RequestMapping(path="delete_index", methods={"get", "post"})
+     */
+    public function deleteIndex()
+    {
+        $result = $this->elasticSearchService->deleteIndex();
+        return $this->response->json($result);
     }
 }
